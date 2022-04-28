@@ -1,4 +1,7 @@
 import java.util.ArrayList;
+import java.util.List;
+
+import Cell.Colors;
 
 public class Main {
 
@@ -28,8 +31,30 @@ public class Main {
 
 	}
 
-	public void calculateCategoryUtility() {
+	public void calculateCategoryUtility(ArrayList<Node> clusters) {
+		Double qLight = 0.0;
+		Double qDark = 0.0;
+		Double qSingleTail = 0.0;
+		Double qDoubleTail = 0.0;
+		ArrayList<Double> probs = new ArrayList<Double>();
 
+		for (Node node : clusters) {
+			for (Cell cell : node.getCells()) {
+				if (cell.getColor() == Cell.Colors.LIGHT) {
+					qLight++;
+				} else {
+					qDark++;
+				}
+
+				if (cell.getTails() == Cell.Tails.SINGLE) {
+					qSingleTail++;
+				} else {
+					qDoubleTail++;
+				}
+			}
+			Double e = Math.pow(qLight, 2) + Math.pow(qDark, 2) + Math.pow(qSingleTail, 2) + Math.pow(qDoubleTail, 2);
+			probs.add(e);
+		}
 	}
 
 	public static void main(String[] args) {
