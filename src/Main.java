@@ -18,43 +18,46 @@ public class Main {
 			root.addCell(record);
 		} else {
 			root.addCell(record);
+			//TODO: checar necessidade de criar um ArrayList cópia dos filhos e percorrer o mesmo
 			ArrayList<Node> clusters = new ArrayList<Node>();
 			clusters.addAll(root.getChildren());
-
+			clusters.add(root);
 			for (Node node : clusters) {
 				node.addCell(record);
-				/* tornar o calculateCategoryUtility uma função que retorne o valor de categoria
-				   de utilidade, mantendo ao fim do loop o maior.*/
+				//TODO: checar qual node escolher e simular adição de novo nó
+				calculateNodeProbabilites(node);
 				node.getCells().removeIf(cell -> cell == record);
 			}
 		}
 
 	}
 
-	public void calculateCategoryUtility(ArrayList<Node> clusters) {
-		Double qLight = 0.0;
-		Double qDark = 0.0;
-		Double qSingleTail = 0.0;
-		Double qDoubleTail = 0.0;
+	public void calculateNodeProbabilites(Node cluster) {
+		Integer qLight = 0.0;
+		Integer qDark = 0.0;
+		Integer qSingleTail = 0.0;
+		Integer qDoubleTail = 0.0;
 		ArrayList<Double> probs = new ArrayList<Double>();
-
-		for (Node node : clusters) {
-			for (Cell cell : node.getCells()) {
-				if (cell.getColor() == Cell.Colors.LIGHT) {
-					qLight++;
-				} else {
-					qDark++;
-				}
-
-				if (cell.getTails() == Cell.Tails.SINGLE) {
-					qSingleTail++;
-				} else {
-					qDoubleTail++;
-				}
+	
+		for (Cell cell : cluster.getCells()) {
+			int listSize = cluster.getCells().size;
+			if (cell.getColor() == Cell.Colors.LIGHT) {
+				qLight++;
+			} else {
+				qDark++;
 			}
-			Double e = Math.pow(qLight, 2) + Math.pow(qDark, 2) + Math.pow(qSingleTail, 2) + Math.pow(qDoubleTail, 2);
-			probs.add(e);
+
+			if (cell.getTails() == Cell.Tails.SINGLE) {
+				qSingleTail++;
+			} else {
+				qDoubleTail++;
+			}
 		}
+		Double e = Math.pow(qLight/listSize, 2) + 
+					Math.pow(qDarkt/listSize, 2) +
+					Math.pow(qSingleTailt/listSize, 2) +
+					Math.pow(qDoubleTailt/listSize, 2);
+		probs.add(e);
 	}
 
 	public static void main(String[] args) {
