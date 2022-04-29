@@ -1,12 +1,8 @@
-import java.util.ArrayList;
-import java.util.List;
-
-import Cell.Colors;
+import java.util.HashMap;
 
 public class Main {
 
 	static void cobweb(Node root, Cell record) {
-
 		if (root.isLeaf()) {
 			Node l1 = new Node();
 			Node l2 = new Node();
@@ -18,29 +14,45 @@ public class Main {
 			root.addCell(record);
 		} else {
 			root.addCell(record);
-			//TODO: checar necessidade de criar um ArrayList cópia dos filhos e percorrer o mesmo
-			ArrayList<Node> clusters = new ArrayList<Node>();
-			clusters.addAll(root.getChildren());
-			clusters.add(root);
-			for (Node node : clusters) {
+			Node n = new Node();
+			HashMap<Integer, Double> UCs = new HashMap<>();
+			Double clusterScores = 0.0;
+			Double bestScore = 0.0;
+			int key = 0;
+
+			for (Node node : root.getChildren()) {
 				node.addCell(record);
-				//TODO: checar qual node escolher e simular adição de novo nó
-				calculateNodeProbabilites(node);
+				
+				for (int i = 0; i < root.getChildren().size(); i++) {
+					n = root.getChildren().get(i);
+					clusterScores = clusterScores + (n.getCells().size() / root.getCells().size() * nodeProbabilites(n) - nodeProbabilites(root));
+				}
+				UCs.put(root.getChildren().indexOf(node), clusterScores / root.getChildren().size());
+
 				node.getCells().removeIf(cell -> cell == record);
 			}
+
+			for (int k = 0; k < UCs.size(); k++) {
+				if (bestScore < UCs.get(k)){
+					key = k;
+					bestScore = UCs.get(k);
+				}
+			}
+
+			cobweb(root.getChildren().get(key), record);
+
 		}
 
 	}
 
-	public void calculateNodeProbabilites(Node cluster) {
-		Integer qLight = 0.0;
-		Integer qDark = 0.0;
-		Integer qSingleTail = 0.0;
-		Integer qDoubleTail = 0.0;
-		ArrayList<Double> probs = new ArrayList<Double>();
-	
+	static Double nodeProbabilites(Node cluster) {
+		int qLight = 0;
+		int qDark = 0;
+		int qSingleTail = 0;
+		int qDoubleTail = 0;
+		int listSize = cluster.getCells().size();
+
 		for (Cell cell : cluster.getCells()) {
-			int listSize = cluster.getCells().size;
 			if (cell.getColor() == Cell.Colors.LIGHT) {
 				qLight++;
 			} else {
@@ -53,11 +65,8 @@ public class Main {
 				qDoubleTail++;
 			}
 		}
-		Double e = Math.pow(qLight/listSize, 2) + 
-					Math.pow(qDarkt/listSize, 2) +
-					Math.pow(qSingleTailt/listSize, 2) +
-					Math.pow(qDoubleTailt/listSize, 2);
-		probs.add(e);
+		return Math.pow(qLight / listSize, 2) + Math.pow(qDark / listSize, 2) +
+				Math.pow(qSingleTail / listSize, 2) + Math.pow(qDoubleTail / listSize, 2);
 	}
 
 	public static void main(String[] args) {

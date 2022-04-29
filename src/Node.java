@@ -4,7 +4,7 @@ import java.util.List;
 public class Node {
 	private List<Cell> cells = new ArrayList<Cell>();
 	private Node parent;
-	private List<Node> children = new ArrayList<Node>();
+	private ArrayList<Node> children = new ArrayList<Node>();
 
 	public Node() {}
 
@@ -20,7 +20,7 @@ public class Node {
 		this.parent = parent;
 	}
 
-	public List<Node> getChildren() {
+	public ArrayList<Node> getChildren() {
 		return this.children;
 	}
 
