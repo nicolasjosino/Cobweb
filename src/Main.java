@@ -13,36 +13,49 @@ public class Main {
 			root.addChild(l2);
 			root.addCell(record);
 		} else {
-			root.addCell(record);
-			Node n = new Node();
-			HashMap<Integer, Double> UCs = new HashMap<>();
-			Double clusterScores = 0.0;
+			HashMap<Integer, Double> CategoryUtilities = new HashMap<>();
 			Double bestScore = 0.0;
 			int key = 0;
+			root.addCell(record);
 
 			for (Node node : root.getChildren()) {
 				node.addCell(record);
-				
-				for (int i = 0; i < root.getChildren().size(); i++) {
-					n = root.getChildren().get(i);
-					clusterScores = clusterScores + (n.getCells().size() / root.getCells().size() * nodeProbabilites(n) - nodeProbabilites(root));
-				}
-				UCs.put(root.getChildren().indexOf(node), clusterScores / root.getChildren().size());
-
+				CategoryUtilities.put(root.getChildren().indexOf(node), getCategoryUtility(root));
 				node.getCells().removeIf(cell -> cell == record);
 			}
 
-			for (int k = 0; k < UCs.size(); k++) {
-				if (bestScore < UCs.get(k)){
+			for (int k = 0; k < CategoryUtilities.size(); k++) {
+				if (bestScore < CategoryUtilities.get(k)) {
 					key = k;
-					bestScore = UCs.get(k);
+					bestScore = CategoryUtilities.get(k);
 				}
 			}
 
-			cobweb(root.getChildren().get(key), record);
+			Node newChild = new Node();
+			newChild.addCell(record);
+			root.addChild(newChild);
+			
+			if (bestScore > getCategoryUtility(root) ) {
+				cobweb(root.getChildren().get(key), record);	
+			} else {
+				root.getChildren().remove(newChild);
+			}
 
 		}
 
+	}
+
+	public static double getCategoryUtility(Node root) {
+		Node n = new Node();
+		Double clusterScores = 0.0;
+
+		for (int i = 0; i < root.getChildren().size(); i++) {
+			n = root.getChildren().get(i);
+			clusterScores = clusterScores
+					+ (n.getCells().size() / root.getCells().size() * nodeProbabilites(n) - nodeProbabilites(root));
+		}
+
+		return clusterScores / root.getChildren().size();
 	}
 
 	static Double nodeProbabilites(Node cluster) {
